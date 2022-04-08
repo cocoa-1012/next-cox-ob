@@ -1,0 +1,9 @@
+# Ignore artifacts:
+build
+theme
+node_modules
+public
+docker-compose.yml
+bitbucket-pipelines.yml
+Dockerfile
+.next
