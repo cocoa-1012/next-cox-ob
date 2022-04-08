@@ -1,0 +1,190 @@
+# Template docker-push
+
+# This template allows you to build and push your docker image to a Docker Hub account.
+# The workflow allows running tests, code linting and security scans on feature branches (as well as master).
+# The docker image will be validated and pushed to the docker registry after the code is merged to master.
+
+# Prerequisites: $DOCKERHUB_USERNAME, $DOCKERHUB_PASSWORD setup as deployment variables
+
+image: node:16-alpine
+
+definitions:
+  caches:
+    cypress: $HOME/.cache/Cypress
+    sonar: /opt/sonar-scanner/.sonar
+    nextjs: ~/.next/cache
+
+clone:
+  depth: full
+
+pipelines:
+  custom:
+    cypress-development:
+      - step:
+          name: Execute Cypress tests for dev
+          image: cypress/browsers:node16.14.0-slim-chrome99-ff97
+          caches:
+            - node
+            - cypress
+          script:
+            - npm install
+            - CYPRESS_BASE_URL=https://ui.dev.swiftbrick.de npm run test:e2e
+    build-preview:
+      - step:
+          name: Deploy to Development
+          deployment: Development
+          caches:
+            - node
+            - nextjs
+          script:
+            - npm install
+            - npm run build:development
+            - IMAGE_NAME=preview
+            - docker build . --file Dockerfile --tag ${IMAGE_NAME}
+            - echo ${PASSWORD} | docker login "$REGISTRY_URL" --username "$USERNAME" --password-stdin
+            - VERSION=${BITBUCKET_BUILD_NUMBER}-dev
+            - IMAGE=${REGISTRY_URL}/${IMAGE_NAME}
+            - docker tag "${IMAGE_NAME}" "${IMAGE}:${VERSION}"
+            - docker push "${IMAGE}:${VERSION}"
+            - pipe: atlassian/trigger-pipeline:5.0.0
+              variables:
+                BITBUCKET_USERNAME: "${BITBUCKET_USERNAME}"
+                BITBUCKET_APP_PASSWORD: "${BITBUCKET_APP_PASSWORD}"
+                REPOSITORY: 'gitops'
+                REF_NAME: 'development' 
+                CUSTOM_PIPELINE_NAME: 'version-increase'
+                PIPELINE_VARIABLES: >
+                  [{
+                    "key": "ImageName",
+                    "value": "${IMAGE_NAME}"
+                  },
+                  {
+                    "key": "NewImageTag",
+                    "value": "${VERSION}"
+                  },
+                  {
+                    "key": "Environment",
+                    "value": "development"
+                  }]
+                WAIT: 'false'
+          services:
+            - docker
+  pull-requests:
+    '**':
+      - step: 
+          caches:
+            - sonar
+            - node
+          name: SonarQube analysis
+          script:
+            - npm install
+            - npm run test -- --watchAll=false --coverage
+            - npm run build
+            - pipe: sonarsource/sonarqube-scan:1.0.0
+              variables:
+                SONAR_HOST_URL: ${SONAR_HOST_URL}
+                SONAR_TOKEN: ${SONAR_TOKEN}
+  tags:
+    '*':
+      - step:
+          name: Deploy to Development
+          deployment: Development
+          caches:
+            - node
+            - nextjs
+          script:
+            - npm install
+            - npm run build:development
+            - IMAGE_NAME=${BITBUCKET_REPO_SLUG}
+            - docker build . --file Dockerfile --tag ${IMAGE_NAME}
+            - echo ${PASSWORD} | docker login "$REGISTRY_URL" --username "$USERNAME" --password-stdin
+            - VERSION=${BITBUCKET_TAG}-dev
+            - IMAGE=${REGISTRY_URL}/${IMAGE_NAME}
+            - docker tag "${IMAGE_NAME}" "${IMAGE}:${VERSION}"
+            - docker push "${IMAGE}:${VERSION}"
+            - pipe: atlassian/trigger-pipeline:5.0.0
+              variables:
+                BITBUCKET_USERNAME: "${BITBUCKET_USERNAME}"
+                BITBUCKET_APP_PASSWORD: "${BITBUCKET_APP_PASSWORD}"
+                REPOSITORY: 'gitops'
+                REF_NAME: 'development'
+                CUSTOM_PIPELINE_NAME: 'version-increase'
+                PIPELINE_VARIABLES: >
+                  [{
+                    "key": "ImageName",
+                    "value": "${IMAGE_NAME}"
+                  },
+                  {
+                    "key": "NewImageTag",
+                    "value": "${VERSION}"
+                  },
+                  {
+                    "key": "Environment",
+                    "value": "development"
+                  }]
+                WAIT: 'false'
+          services:
+            - docker
+      - step:
+          name: Build Storybook
+          caches:
+            - node
+          script:
+            - npm install
+            - npm run build-storybook
+            - IMAGE_NAME=${BITBUCKET_REPO_SLUG}-storybook
+            - docker build . --file Dockerfile.storybook --tag ${IMAGE_NAME}
+            - echo ${PASSWORD} | docker login "$REGISTRY_URL" --username "$USERNAME" --password-stdin
+            - VERSION=${BITBUCKET_TAG}-dev
+            - IMAGE=${REGISTRY_URL}/${IMAGE_NAME}
+            - docker tag "${IMAGE_NAME}" "${IMAGE}:${VERSION}"
+            - docker push "${IMAGE}:${VERSION}"
+          services:
+            - docker
+      
+      - step:
+          name: Deploy to Production
+          deployment: Production
+          caches:
+            - node
+          script:
+            - npm install
+            - npm run build:production
+            - IMAGE_NAME=${BITBUCKET_REPO_SLUG}
+            - docker build . --file Dockerfile --tag ${IMAGE_NAME}
+            - echo ${PASSWORD} | docker login "$REGISTRY_URL" --username "$USERNAME" --password-stdin
+            - VERSION=${BITBUCKET_TAG}
+            - IMAGE=${REGISTRY_URL}/${IMAGE_NAME}
+            - docker tag "${IMAGE_NAME}" "${IMAGE}:${VERSION}"
+            - docker push "${IMAGE}:${VERSION}"
+          services:
+            - docker
+  branches: 
+    master:
+      - step: 
+          caches:
+            - sonar
+            - node
+          name: SonarQube analysis
+          script:
+            - npm install 
+            - npm run test -- --watchAll=false --coverage
+            - pipe: sonarsource/sonarqube-scan:1.0.0
+              variables:
+                SONAR_HOST_URL: ${SONAR_HOST_URL}
+                SONAR_TOKEN: ${SONAR_TOKEN}
+      - step:
+          name: Tag Version
+          image: golang:1.17
+          script:
+            - apt-get update && apt-get install -y libicu67
+            - wget https://github.com/GitTools/GitVersion/releases/download/5.8.1/gitversion-linux-x64-5.8.1.tar.gz
+            - tar -xvf gitversion-linux-x64-5.8.1.tar.gz
+            - chmod 0777 gitversion
+            - ./gitversion
+            - ./gitversion /showvariable semver
+            - export GV_SEMVER=v`./gitversion /showvariable semver`
+            - echo $GV_SEMVER
+            - git tag $GV_SEMVER ${BITBUCKET_COMMIT}
+            - git push origin --tags
+            

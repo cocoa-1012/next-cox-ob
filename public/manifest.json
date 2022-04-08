@@ -1,0 +1,35 @@
+{
+  "short_name": "Justhome Webapp",
+  "name": "Justhome - Get your home!",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "80x80",
+      "type": "image/png"
+    },
+    {
+      "src": "icon192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "iconAlt192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "iconAlt512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

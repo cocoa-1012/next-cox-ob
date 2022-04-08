@@ -1,0 +1,18 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "reporter": "cypress-multi-reporters",
+  "reporterOptions": {
+    "reporterEnabled": "cypress-mochawesome-reporter, mocha-junit-reporter",
+    "cypressMochawesomeReporterReporterOptions": {
+      "reportDir": "cypress/test-reports",
+      "charts": true,
+      "reportPageTitle": "My Test Suite",
+      "embeddedScreenshots": true,
+      "inlineAssets": true
+    },
+    "mochaJunitReporterReporterOptions": {
+      "mochaFile": "cypress/test-reports/junit/results-[hash].xml"
+    }
+  },
+  "video": false
+}

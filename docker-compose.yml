@@ -1,0 +1,15 @@
+version: '3.1'
+
+services:
+
+  static:
+    image: ui
+    restart: always
+    ports:
+      - 1111:80
+    networks:
+      - jh-local-network
+
+networks:
+  jh-local-network:
+    name: jh-local-network

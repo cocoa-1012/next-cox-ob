@@ -1,0 +1,14 @@
+.title {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.icon {
+  transition: transform 350ms ease;
+}
+
+.isActive {
+  > .icon {
+    transform: rotateZ(180deg);
+  }
+}

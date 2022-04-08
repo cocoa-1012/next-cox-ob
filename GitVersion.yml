@@ -1,0 +1,19 @@
+mode: Mainline
+branches:
+  main:
+    regex: ^master$|^main$
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    is-mainline: true
+ignore:
+  sha: []
+merge-message-formats: {}
+assembly-versioning-scheme: MajorMinorPatch
+assembly-file-versioning-scheme: MajorMinorPatch
+assembly-informational-format: '{InformationalVersion}'
+tag-prefix: '[vV]'
+major-version-bump-message: '.*breaking.*|.*release.*'
+minor-version-bump-message: '.*feature.*|.*minor.*'
+patch-version-bump-message: '.*hotfix.*|.*patch.*|.*bugfix.*'
+no-bump-message: '.*none.*|.*skip.*'

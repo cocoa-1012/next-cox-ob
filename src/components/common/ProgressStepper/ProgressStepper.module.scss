@@ -1,0 +1,13 @@
+.bar {
+  border: 2px solid var(--bs-dark);
+  border-radius: 4px;
+  background: var(--bs-dark);
+}
+
+.progress {
+  height: 8px;
+  min-width: 8px;
+  background: var(--bs-success);
+  border-radius: 2px;
+  transition: width 0.5s;
+}
