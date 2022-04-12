@@ -168,5 +168,7 @@ export const de = {
       "Im Anschluss daran können wir gemeinsam ermitteln, welcher Kaufpreis gut in dein Budget passt. Nutze hierfür gerne unseren Kaufpreis-Rechner.",
 
     account_details: "Konto Details",
+    errorboundary_heading: "Fehler!",
+    errorboundary_text: "Entschuldigung, da ist etwas schief gelaufen."
   },
 };

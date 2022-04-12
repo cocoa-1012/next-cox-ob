@@ -170,5 +170,7 @@ export const en = {
       "This figure is calculated very carefully. What is always more important is what amount you feel comfortable with. Afterwards, we can work together to determine which purchase price fits your budget. You can use our purchase price calculator for this.",
 
     account_details: "Account Details",
+    errorboundary_heading: "Error!",
+    errorboundary_text: "Sorry, There is something went wrong."
   },
 };

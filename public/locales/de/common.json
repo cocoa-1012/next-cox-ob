@@ -164,5 +164,9 @@
   "installment_calculator_result_section_3":
   "Du kannst monatlich eine Rate von {{rate}}€ ausgeben. Diese Zahl ist sehr vorsichtig berechnet. Wichtiger ist dabei immer, mit welchem Betrag du dich wohlfühlst.",
   "installment_calculator_result_section_4":
-  "Im Anschluss daran können wir gemeinsam ermitteln, welcher Kaufpreis gut in dein Budget passt. Nutze hierfür gerne unseren Kaufpreis-Rechner."
+  "Im Anschluss daran können wir gemeinsam ermitteln, welcher Kaufpreis gut in dein Budget passt. Nutze hierfür gerne unseren Kaufpreis-Rechner.",
+  "errorboundary_heading": 
+  "Fehler!",
+  "errorboundary_text":
+  "Entschuldigung, da ist etwas schief gelaufen."
 }

@@ -166,5 +166,9 @@
   "installment_calculator_result_section_3":
   "You can spend €{{rate}} per month.",
   "installment_calculator_result_section_4":
-  "This figure is calculated very carefully. What is always more important is what amount you feel comfortable with. Afterwards, we can work together to determine which purchase price fits your budget. You can use our purchase price calculator for this."
+  "This figure is calculated very carefully. What is always more important is what amount you feel comfortable with. Afterwards, we can work together to determine which purchase price fits your budget. You can use our purchase price calculator for this.",
+  "errorboundary_heading": 
+  "Error!",
+  "errorboundary_text":
+  "Sorry, There is something went wrong."
 }
